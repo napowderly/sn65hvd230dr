@@ -4,3 +4,6 @@ builds:
     entry: elec/src/sn65hvd230dr.ato:Sn65hvd230dr
 dependencies:
 - generics
+
+services:
+  components: https://atopile-component-server-atsuhzfd5a-uc.a.run.app/jlc
