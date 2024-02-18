@@ -1,8 +1,31 @@
 import CAN_TTL from "generics/interfaces.ato"
 import CAN from "generics/interfaces.ato"
 import Power from "generics/interfaces.ato"
+import Resistor from "generics/resistors.ato"
+import Capacitor from "generics/capacitors.ato"
 
-component SN65HVD230DR:
+module SN65HVD230DR:
+    # External connections
+    power = new Power
+    can_ttl = new CAN_TTL
+    can = new CAN
+
+    # Components
+    ic = new _SN65HVD230DR
+    bypass_cap = new Capacitor
+
+    # Internal connections
+    power ~ ic.power
+    power ~ bypass_cap.power
+    can_ttl ~ ic.can_ttl
+    can ~ ic.can
+
+    # Bypass capacitors
+    bypass_cap.footprint = "C0402"
+    bypass_cap.value = 100nF +/- 25%
+
+
+component _SN65HVD230DR:
     footprint = "SOIC-8_L4.9-W3.9-P1.27-LS6.0-BL"
     mpn = "C12084"
     # pins
@@ -15,61 +38,16 @@ component SN65HVD230DR:
     signal CANH ~ pin 7
     signal RS ~ pin 8
 
-    # pin types
-
-import Resistor from "generics/resistors.ato"
-import Capacitor from "generics/capacitors.ato"
-module can_xcvr:
-    xcvr = new SN65HVD230DR
-    signal v_3_3
-    signal gnd
-    signal can_rx
-    signal can_tx
-    signal CANH
-    signal CANL
-
     power = new Power
-    power.vcc ~ v_3_3
-    power.gnd ~ gnd
-
     can_ttl = new CAN_TTL
-    can_ttl.rx ~ can_rx
-    can_ttl.tx ~ can_tx
     can = new CAN
+
+    power.vcc ~ VCC
+    power.gnd ~ GND
+    power.gnd ~ RS
+
+    can_ttl.rx ~ R
+    can_ttl.tx ~ D
+
     can.CANH ~ CANH
     can.CANL ~ CANL
-
-    xcvr.VCC ~ v_3_3
-    xcvr.GND ~ gnd
-    xcvr.R ~ can_rx
-    xcvr.D ~ can_tx
-    xcvr.CANH ~ CANH
-    xcvr.CANL ~ CANL
-    xcvr.RS ~ gnd
-
-    # Bypass capacitors
-    c_bp = new Capacitor
-    c_bp.footprint = "C0402"
-    c_bp.value = 100nF +/- 25%
-    c_bp.p1 ~ v_3_3
-    c_bp.p2 ~ gnd
-
-    # Termination
-    signal v_mid
-    xcvr.VREF ~ v_mid
-    r_term_h = new Resistor
-    r_term_h.footprint = "R0402"
-    r_term_h.value = 56ohm +/- 10%
-    r_term_h.p1 ~ CANH
-    r_term_h.p2 ~ v_mid
-    r_term_l = new Resistor
-    r_term_l.footprint = "R0402"
-    r_term_l.value = 56ohm +/- 10%
-    r_term_l.p1 ~ CANL
-    r_term_l.p2 ~ v_mid
-    c_term = new Capacitor
-    c_term.footprint = "C0402"
-    c_term.value = 10nF +/- 25%
-    c_term.mpn = "C15195"
-    c_term.p1 ~ v_mid
-    c_term.p2 ~ gnd

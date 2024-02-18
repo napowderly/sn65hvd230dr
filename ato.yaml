@@ -1,7 +1,7 @@
 ato-version: ^0.2.0
 builds:
   default:
-    entry: elec/src/sn65hvd230dr.ato:Sn65hvd230dr
+    entry: elec/src/sn65hvd230dr.ato:SN65HVD230DR
 dependencies:
 - generics
 
